@@ -1,3 +1,11 @@
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import requests
+
+# Charger le dataset
+data = pd.read_csv('understat.com.csv')
+
 # Ajouter l'URL de base pour les logos
 GITHUB_BASE_URL = "https://raw.githubusercontent.com/Rako75/streamlitfoot/main/Premier%20League/"
 DEFAULT_LOGO = f"{GITHUB_BASE_URL}default.png"
