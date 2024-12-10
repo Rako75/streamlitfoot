@@ -28,7 +28,7 @@ def get_logo_path(team_name):
 data['logo_url'] = data['team'].apply(get_logo_path)
 
 # Titre de l'application
-st.title("Évolution des Points des Équipes par Ligue avec Logos")
+st.title("Évolution des Équipes avec Logos Déplaçant")
 
 # Filtrer les données par ligue
 leagues = data['league'].unique()  # Suppose que cette colonne contient les noms des ligues
@@ -38,7 +38,7 @@ selected_league = st.selectbox("Sélectionnez une ligue :", options=leagues)
 filtered_data = data[data['league'] == selected_league]
 
 # Animation des points par année avec logos
-st.subheader(f"Évolution des Points pour {selected_league}")
+st.subheader(f"Évolution des Logos pour {selected_league}")
 
 # Créer un graphique interactif avec animation
 fig_animation = px.scatter(
@@ -68,8 +68,8 @@ for i, row in filtered_data.iterrows():
                 y=row['pts'],
                 xref="x",
                 yref="y",
-                sizex=2,
-                sizey=2,
+                sizex=0.1,  # Ajuster la taille des logos
+                sizey=0.1,  # Ajuster la taille des logos
                 xanchor="center",
                 yanchor="middle"
             )
