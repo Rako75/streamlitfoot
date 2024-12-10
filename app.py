@@ -7,9 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1lD0B-ocKCECJtiVrtVwN2ncRkpTqSXQ-
 """
 
-import streamlit as st
-import pandas as pd
-import plotly.express as px
 
 # Charger le dataset
 data = pd.read_csv('understat.com.csv')
