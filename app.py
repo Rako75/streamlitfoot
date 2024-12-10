@@ -1,26 +1,31 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import requests
+from PIL import Image
+import base64
+import os
 
 # Charger le dataset
 data = pd.read_csv('understat.com.csv')
 
-# Ajouter l'URL de base pour les logos
-GITHUB_BASE_URL = "https://raw.githubusercontent.com/Rako75/streamlitfoot/main/Premier%20League/"
-DEFAULT_LOGO = f"{GITHUB_BASE_URL}default.png"
+# Fonction pour convertir une image en base64
+def image_to_base64(image_path):
+    with open(image_path, "rb") as img_file:
+        return "data:image/png;base64," + base64.b64encode(img_file.read()).decode()
 
-# Vérification des URLs
-def is_valid_logo_url(url):
-    try:
-        response = requests.head(url)
-        return response.status_code == 200
-    except:
-        return False
+# Ajouter le chemin des logos
+LOGO_FOLDER = "Premier League"
 
-# Ajouter une colonne avec les URLs des logos
-data['logo_url'] = data['team'].apply(lambda x: f"{GITHUB_BASE_URL}{x.replace(' ', '_')}.png")
-data['logo_url'] = data['logo_url'].apply(lambda url: url if is_valid_logo_url(url) else DEFAULT_LOGO)
+# Ajouter une colonne avec les URLs des logos en base64
+def get_logo_path(team_name):
+    team_logo = f"{team_name.replace(' ', '_')}.png"
+    logo_path = os.path.join(LOGO_FOLDER, team_logo)
+    if os.path.exists(logo_path):
+        return image_to_base64(logo_path)
+    else:
+        return None  # Si le logo n'existe pas
+
+data['logo_url'] = data['team'].apply(get_logo_path)
 
 # Titre de l'application
 st.title("Évolution des Points des Équipes par Ligue avec Logos")
@@ -55,19 +60,20 @@ fig_animation = px.scatter(
 
 # Ajouter les logos au graphique
 for i, row in filtered_data.iterrows():
-    fig_animation.add_layout_image(
-        dict(
-            source=row['logo_url'],
-            x=row['position'],
-            y=row['pts'],
-            xref="x",
-            yref="y",
-            sizex=2,
-            sizey=2,
-            xanchor="center",
-            yanchor="middle"
+    if row['logo_url']:  # Vérifier que l'image est disponible
+        fig_animation.add_layout_image(
+            dict(
+                source=row['logo_url'],  # URL en base64
+                x=row['position'],
+                y=row['pts'],
+                xref="x",
+                yref="y",
+                sizex=2,
+                sizey=2,
+                xanchor="center",
+                yanchor="middle"
+            )
         )
-    )
 
 # Afficher le graphique dans Streamlit
 st.plotly_chart(fig_animation)
