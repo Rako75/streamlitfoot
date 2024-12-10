@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.colors import qualitative  # Utilisation directe des couleurs qualitatives
 
 # Charger les données
 data = pd.read_csv('df_Big5.csv')
@@ -35,25 +36,8 @@ if len(players_choice) > 0 and len(stats_choice) > 0:
             theta=stats_choice,
             fill='toself',
             name=player,
-            marker=dict(color=px.colors.qualitative.Plotly[idx % len(px.colors.qualitative.Plotly)]),  # Couleurs distinctes
+            marker=dict(color=qualitative.Plotly[idx % len(qualitative.Plotly)]),  # Couleurs distinctes
         ))
-
-    # Ajouter des annotations pour chaque point
-    for player in radar_data_normalized.index:
-        for i, stat in enumerate(stats_choice):
-            value = radar_data.loc[player, stat]
-            angle = 360 / len(stats_choice) * i
-            fig.add_annotation(
-                x=0.5,
-                y=0.5,
-                text=f"{value:.2f}",
-                showarrow=False,
-                font=dict(size=10),
-                xanchor="center",
-                yanchor="middle",
-                xshift=80 * i * 0.5,  # Ajuster pour éviter la collision
-                yshift=80 * i * 0.5,
-            )
 
     # Configurer le graphique
     fig.update_layout(
@@ -61,7 +45,7 @@ if len(players_choice) > 0 and len(stats_choice) > 0:
             radialaxis=dict(visible=True, range=[0, 1], tickvals=[0, 0.5, 1], ticktext=["0", "0.5", "1"])
         ),
         showlegend=True,
-        title="Comparaison des joueurs (Radar Chart avec Annotations)",
+        title="Comparaison des joueurs (Radar Chart avec Annotations)"
     )
 
     # Afficher le radar chart
