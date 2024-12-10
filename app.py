@@ -28,25 +28,44 @@ if len(players_choice) > 0 and len(stats_choice) > 0:
 
     # Créer le radar chart avec Plotly
     fig = go.Figure()
-    for player in radar_data_normalized.index:
+
+    for idx, player in enumerate(radar_data_normalized.index):
         fig.add_trace(go.Scatterpolar(
             r=radar_data_normalized.loc[player].values,
             theta=stats_choice,
             fill='toself',
-            name=player
+            name=player,
+            marker=dict(color=px.colors.qualitative.Plotly[idx % len(px.colors.qualitative.Plotly)]),  # Couleurs distinctes
         ))
+
+    # Ajouter des annotations pour chaque point
+    for player in radar_data_normalized.index:
+        for i, stat in enumerate(stats_choice):
+            value = radar_data.loc[player, stat]
+            angle = 360 / len(stats_choice) * i
+            fig.add_annotation(
+                x=0.5,
+                y=0.5,
+                text=f"{value:.2f}",
+                showarrow=False,
+                font=dict(size=10),
+                xanchor="center",
+                yanchor="middle",
+                xshift=80 * i * 0.5,  # Ajuster pour éviter la collision
+                yshift=80 * i * 0.5,
+            )
 
     # Configurer le graphique
     fig.update_layout(
         polar=dict(
-            radialaxis=dict(visible=True, range=[0, 1])
+            radialaxis=dict(visible=True, range=[0, 1], tickvals=[0, 0.5, 1], ticktext=["0", "0.5", "1"])
         ),
         showlegend=True,
-        title="Comparaison des joueurs (Radar Chart)"
+        title="Comparaison des joueurs (Radar Chart avec Annotations)",
     )
 
     # Afficher le radar chart
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)
 
 else:
     st.write("Veuillez sélectionner au moins un joueur et une statistique pour afficher le radar chart.")
