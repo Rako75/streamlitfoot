@@ -39,7 +39,7 @@ leagues = data['league'].unique()  # Suppose que cette colonne contient les noms
 selected_league = st.selectbox("Sélectionnez une ligue :", options=leagues)
 
 # Filtrer les données en fonction de la ligue sélectionnée
-filtered_data = data[data['Unnamed: 0'] == selected_league]
+filtered_data = data[data['league == selected_league]
 
 # Animation des points par année avec logos
 st.subheader(f"Évolution des Points pour {selected_league}")
