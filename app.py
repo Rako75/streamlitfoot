@@ -35,7 +35,7 @@ data['logo_url'] = data['logo_url'].apply(lambda url: url if is_valid_logo_url(u
 st.title("Évolution des Points des Équipes par Ligue avec Logos")
 
 # Filtrer les données par ligue
-leagues = data['Unnamed: 0'].unique()  # Suppose que cette colonne contient les noms des ligues
+leagues = data['league'].unique()  # Suppose que cette colonne contient les noms des ligues
 selected_league = st.selectbox("Sélectionnez une ligue :", options=leagues)
 
 # Filtrer les données en fonction de la ligue sélectionnée
@@ -49,13 +49,13 @@ fig_animation = px.scatter(
     filtered_data,
     x="position",
     y="pts",
-    animation_frame="Unnamed: 1",
+    animation_frame="year",
     size="pts",
     color="team",
     hover_name="team",
     title=f"Évolution des Points en {selected_league}",
     labels={
-        "Unnamed: 1": "Année",
+        "year": "Année",
         "pts": "Points",
         "position": "Position (Classement)"
     },
