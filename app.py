@@ -5,17 +5,14 @@ import plotly.graph_objects as go
 # Charger les données
 data = pd.read_csv('df_Big5.csv')
 
+# Filtrer les colonnes numériques uniquement
+numeric_columns = data.select_dtypes(include='number').columns.tolist()
+
 # Interface Streamlit : Sélectionner les joueurs
 players_choice = st.multiselect('Choisissez des joueurs à comparer', data['Player'].unique())
 
-# Interface Streamlit : Sélectionner les statistiques à comparer
-stats_choice = st.multiselect(
-    'Choisissez les statistiques à comparer', 
-    ['Performance Gls', 'Performance Ast', 'Expected xG', 'Expected xAG', 
-     'Progression PrgC', 'Progression PrgP', 'Standard SoT', 'Total Cmp%', 
-     'Take-Ons Succ', 'Performance Recov'],
-    default=['Performance Gls', 'Performance Ast', 'Expected xG']
-)
+# Interface Streamlit : Sélectionner les statistiques parmi toutes les colonnes numériques
+stats_choice = st.multiselect('Choisissez les statistiques à comparer', numeric_columns, default=numeric_columns[:6])
 
 if len(players_choice) > 0 and len(stats_choice) > 0:
     # Filtrer les données pour les joueurs sélectionnés
