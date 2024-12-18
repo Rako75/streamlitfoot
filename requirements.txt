@@ -3,3 +3,5 @@ seaborn
 plotly
 matplotlib
 streamlit
+transformers
+torch 
