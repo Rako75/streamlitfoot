@@ -157,6 +157,8 @@ elif action == "Comparer deux joueurs":
 
 # Question générale avec Gemini
 if action == "Question générale":
+    st.markdown("**Note**: Veuillez poser uniquement des questions liées au football.")
+    
     prompt = st.text_area(
         "Posez votre question :",
         placeholder="Exemple : Qui sont les nominés pour le Ballon d'Or 2023 ? Quelles sont les statistiques de Lionel Messi cette saison ?",
@@ -165,7 +167,7 @@ if action == "Question générale":
     if st.button("Obtenir une réponse"):
         if prompt:
             # Génération de réponse avec Gemini
-            answer = generate_response(prompt)
+            answer = generate_response(f"Répondre uniquement sur le football : {prompt}")
             st.markdown(f"**Réponse :** {answer}")
         else:
             st.error("Veuillez entrer une question avant de cliquer sur le bouton.")
