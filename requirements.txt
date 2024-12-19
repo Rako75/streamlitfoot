@@ -8,3 +8,5 @@ torch
 python-dotenv
 chatterbot 
 chatterbot_corpus
+openai
+requests
