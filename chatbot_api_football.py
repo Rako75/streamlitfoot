@@ -94,8 +94,8 @@ def compare_players(player_name1, player_name2, position_data):
     return comparison
 
 # Interface Streamlit
-st.title("Assistant Football avec Gemini")
-st.markdown("Posez vos questions sur le football et obtenez des réponses intelligentes grâce à Gemini !")
+st.title("ChatBot Football")
+st.markdown("Posez toutes vos questions sur le football !")
 
 # Choisir l'action souhaitée (statistiques, meilleurs buteurs, comparer)
 action = st.radio("Que souhaitez-vous savoir ?", ("Statistiques de joueur", "Meilleurs buteurs", "Comparer deux joueurs", "Question générale"))
@@ -161,7 +161,7 @@ if action == "Question générale":
     
     prompt = st.text_area(
         "Posez votre question :",
-        placeholder="Exemple : Qui sont les nominés pour le Ballon d'Or 2023 ? Quelles sont les statistiques de Lionel Messi cette saison ?",
+        placeholder="Exemple : Qui sont les nominés pour le Ballon d'Or 2024 ? Quelles sont les statistiques de Kylian Mbappe cette saison ?",
     )
 
     if st.button("Obtenir une réponse"):
