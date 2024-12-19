@@ -4,7 +4,7 @@ import google.generativeai as genai
 import streamlit as st
 
 # Définir la clé API Gemini
-os.environ["GEMINI_API_KEY"] = "AIzaSyCqozHPzc1NRb-Xf4t6DEYTDIutFcOe_bU"  # Remplacez par votre clé API
+os.environ["GEMINI_API_KEY"] = "votre_clé_API_GEMINI"  # Remplacez par votre clé API
 
 # Configurer l'API Gemini avec la clé API
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
@@ -94,8 +94,13 @@ def compare_players(player_name1, player_name2, position_data):
     return comparison
 
 # Interface Streamlit
-st.title("ChatBot Football")
-st.markdown("Posez toutes vos questions sur le football !")
+st.title("Assistant Football avec Gemini")
+
+# Ajouter une image depuis GitHub
+image_url = "https://raw.githubusercontent.com/votre_utilisateur/votre_depot/branche/chemin/vers/image.jpg"  # Mettez ici l'URL de votre image
+st.image(image_url, caption="Bienvenue dans l'Assistant Football", use_column_width=True)
+
+st.markdown("Posez vos questions sur le football et obtenez des réponses intelligentes grâce à Gemini !")
 
 # Choisir l'action souhaitée (statistiques, meilleurs buteurs, comparer)
 action = st.radio("Que souhaitez-vous savoir ?", ("Statistiques de joueur", "Meilleurs buteurs", "Comparer deux joueurs", "Question générale"))
@@ -161,7 +166,7 @@ if action == "Question générale":
     
     prompt = st.text_area(
         "Posez votre question :",
-        placeholder="Exemple : Qui sont les nominés pour le Ballon d'Or 2024 ? Quelles sont les statistiques de Kylian Mbappe cette saison ?",
+        placeholder="Exemple : Qui sont les nominés pour le Ballon d'Or 2023 ? Quelles sont les statistiques de Lionel Messi cette saison ?",
     )
 
     if st.button("Obtenir une réponse"):
