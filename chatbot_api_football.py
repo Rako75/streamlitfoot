@@ -22,8 +22,11 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
 )
 
-# Charger la base de données des statistiques des joueurs
-df = pd.read_csv('df_Big5.csv')
+# Charger les sous-datasets
+attaquants = pd.read_csv('Attaquants_Big5.csv')
+milieux = pd.read_csv('Milieux_Big5.csv')
+defenseurs = pd.read_csv('Defenseurs_Big5.csv')
+gardiens = pd.read_csv('Gardiens_Big5.csv')
 
 # Fonction pour générer une réponse avec Gemini
 def generate_response(prompt):
@@ -33,39 +36,65 @@ def generate_response(prompt):
     return response.text
 
 # Fonction pour obtenir les statistiques d'un joueur
-def get_player_stats(player_name):
-    player_data = df[df['Player'].str.contains(player_name, case=False)]
+def get_player_stats(player_name, position_data):
+    player_data = position_data[position_data['Player'].str.contains(player_name, case=False)]
     
     if player_data.empty:
         return f"Aucun joueur trouvé avec le nom {player_name}."
     
-    player_stats = player_data[['Player', 'Performance Gls', 'Performance Ast', 'Performance G+A', 'Performance G-PK', 'League', 'Age', 'Position']]
-    return player_stats.to_string(index=False)
+    # Extraire les statistiques pertinentes
+    player_stats = player_data.iloc[0]
+    
+    # Formuler la réponse naturellement
+    if position_data is attaquants:
+        response = f"{player_name} a marqué {player_stats['Performance Gls']} buts et réalisé {player_stats['Performance Ast']} passes décisives cette saison."
+    elif position_data is milieux:
+        response = f"{player_name} a enregistré {player_stats['Performance Ast']} passes décisives et contribué à {player_stats['Performance G+A']} buts."
+    elif position_data is defenseurs:
+        response = f"{player_name} a réalisé {player_stats['Performance TklW']} tacles et {player_stats['Performance Blks']} blocs."
+    elif position_data is gardiens:
+        response = f"{player_name} a effectué {player_stats['Performance Save']} arrêts et {player_stats['Performance CleanSheets']} clean sheets."
+    
+    return response
 
 # Fonction pour obtenir les meilleurs buteurs d'une ligue
-def get_top_scorers(league_name):
-    league_data = df[df['League'].str.contains(league_name, case=False)]
+def get_top_scorers(league_name, position_data):
+    league_data = position_data[position_data['League'].str.contains(league_name, case=False)]
     
     # Trier les joueurs par nombre de buts marqués
     top_scorers = league_data[['Player', 'Performance Gls']].sort_values(by='Performance Gls', ascending=False).head(5)
-    return top_scorers.to_string(index=False)
+    
+    response = f"Voici les meilleurs buteurs de la {league_name} :\n"
+    for index, row in top_scorers.iterrows():
+        response += f"{row['Player']} avec {row['Performance Gls']} buts.\n"
+    
+    return response
 
 # Fonction pour comparer deux joueurs
-def compare_players(player_name1, player_name2):
-    player_data1 = df[df['Player'].str.contains(player_name1, case=False)]
-    player_data2 = df[df['Player'].str.contains(player_name2, case=False)]
+def compare_players(player_name1, player_name2, position_data):
+    player_data1 = position_data[position_data['Player'].str.contains(player_name1, case=False)]
+    player_data2 = position_data[position_data['Player'].str.contains(player_name2, case=False)]
     
     if player_data1.empty or player_data2.empty:
         return "Un ou les deux joueurs n'ont pas été trouvés."
     
-    stats1 = player_data1[['Player', 'Performance Gls', 'Performance Ast', 'Performance G+A', 'Performance G-PK']].iloc[0]
-    stats2 = player_data2[['Player', 'Performance Gls', 'Performance Ast', 'Performance G+A', 'Performance G-PK']].iloc[0]
+    stats1 = player_data1.iloc[0]
+    stats2 = player_data2.iloc[0]
     
-    comparison = f"Comparaison entre {stats1['Player']} et {stats2['Player']}:\n"
-    comparison += f"Buts: {stats1['Performance Gls']} vs {stats2['Performance Gls']}\n"
-    comparison += f"Passes décisives: {stats1['Performance Ast']} vs {stats2['Performance Ast']}\n"
-    comparison += f"Buts + Passes décisives: {stats1['Performance G+A']} vs {stats2['Performance G+A']}\n"
-    comparison += f"Buts marqués (sans penaltys): {stats1['Performance G-PK']} vs {stats2['Performance G-PK']}"
+    comparison = f"Comparaison entre {stats1['Player']} et {stats2['Player']} :\n"
+    
+    if position_data is attaquants:
+        comparison += f" - Buts : {stats1['Performance Gls']} vs {stats2['Performance Gls']}\n"
+        comparison += f" - Passes décisives : {stats1['Performance Ast']} vs {stats2['Performance Ast']}\n"
+    elif position_data is milieux:
+        comparison += f" - Passes décisives : {stats1['Performance Ast']} vs {stats2['Performance Ast']}\n"
+        comparison += f" - Contributions (Buts + Passes) : {stats1['Performance G+A']} vs {stats2['Performance G+A']}\n"
+    elif position_data is defenseurs:
+        comparison += f" - Tacles réalisés : {stats1['Performance TklW']} vs {stats2['Performance TklW']}\n"
+        comparison += f" - Blocs réalisés : {stats1['Performance Blks']} vs {stats2['Performance Blks']}\n"
+    elif position_data is gardiens:
+        comparison += f" - Arrêts : {stats1['Performance Save']} vs {stats2['Performance Save']}\n"
+        comparison += f" - Clean Sheets : {stats1['Performance CleanSheets']} vs {stats2['Performance CleanSheets']}\n"
     
     return comparison
 
@@ -77,39 +106,62 @@ st.markdown("Posez vos questions sur le football et obtenez des réponses intell
 action = st.radio("Que souhaitez-vous savoir ?", ("Statistiques de joueur", "Meilleurs buteurs", "Comparer deux joueurs", "Question générale"))
 
 if action == "Statistiques de joueur":
+    position = st.radio("Sélectionnez la position du joueur", ("Attaquants", "Milieux", "Défenseurs", "Gardiens"))
     player_name = st.text_input("Entrez le nom du joueur :")
+    
+    if position == "Attaquants":
+        data = attaquants
+    elif position == "Milieux":
+        data = milieux
+    elif position == "Défenseurs":
+        data = defenseurs
+    else:
+        data = gardiens
+    
     if st.button("Obtenir les statistiques"):
         if player_name:
-            stats = get_player_stats(player_name)
-            st.text_area("Statistiques du joueur", stats, height=300)
+            stats = get_player_stats(player_name, data)
+            st.text_area("Statistiques du joueur", stats, height=200)
         else:
             st.error("Veuillez entrer le nom d'un joueur.")
 
 elif action == "Meilleurs buteurs":
     league_name = st.text_input("Entrez le nom de la ligue :")
+    position = st.radio("Sélectionnez la position des joueurs", ("Attaquants", "Milieux", "Défenseurs", "Gardiens"))
+    
+    if position == "Attaquants":
+        data = attaquants
+    elif position == "Milieux":
+        data = milieux
+    elif position == "Défenseurs":
+        data = defenseurs
+    else:
+        data = gardiens
+    
     if st.button("Obtenir les meilleurs buteurs"):
         if league_name:
-            top_scorers = get_top_scorers(league_name)
-            st.text_area("Meilleurs buteurs", top_scorers, height=300)
+            top_scorers = get_top_scorers(league_name, data)
+            st.text_area("Meilleurs buteurs", top_scorers, height=200)
         else:
             st.error("Veuillez entrer le nom d'une ligue.")
 
 elif action == "Comparer deux joueurs":
+    position = st.radio("Sélectionnez la position des joueurs", ("Attaquants", "Milieux", "Défenseurs", "Gardiens"))
     player1 = st.text_input("Entrez le premier joueur :")
     player2 = st.text_input("Entrez le deuxième joueur :")
+    
+    if position == "Attaquants":
+        data = attaquants
+    elif position == "Milieux":
+        data = milieux
+    elif position == "Défenseurs":
+        data = defenseurs
+    else:
+        data = gardiens
+    
     if st.button("Comparer les joueurs"):
         if player1 and player2:
-            comparison = compare_players(player1, player2)
-            st.text_area("Comparaison des joueurs", comparison, height=300)
+            comparison = compare_players(player1, player2, data)
+            st.text_area("Comparaison des joueurs", comparison, height=200)
         else:
-            st.error("Veuillez entrer les noms de deux joueurs.")
-
-elif action == "Question générale":
-    prompt = st.text_area("Posez votre question :", placeholder="Exemple : Qui a remporté le Ballon d'Or 2023 ?")
-    if st.button("Obtenir une réponse avec Gemini"):
-        if prompt:
-            answer = generate_response(prompt)
-            st.text_area("Réponse avec Gemini", answer, height=300)
-        else:
-            st.error("Veuillez entrer une question avant de cliquer sur le bouton.")
-
+            st.error("Veuillez entrer les noms des deux joueurs.")
