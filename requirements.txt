@@ -1,13 +1,1 @@
-pandas
-seaborn
-plotly
-matplotlib
-streamlit
-transformers
-torch 
-python-dotenv
-chatterbot 
-chatterbot_corpus
-openai
-requests
 google-generativeai
