@@ -41,7 +41,7 @@ def generate_response(prompt):
         )
         return completion.choices[0].text.strip()
     except Exception as e:
-        return f"Erreur lors de l'appel au modèle GPT : {str(e)}"
+        return f"Erreur lors de l'appel au modèle GPT : {Str(e)}"
 
 # Interface Streamlit
 st.title("Chatbot Football ⚽")
