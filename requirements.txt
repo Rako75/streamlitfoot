@@ -6,3 +6,5 @@ streamlit
 transformers
 torch 
 python-dotenv
+chatterbot 
+chatterbot_corpus
