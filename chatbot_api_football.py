@@ -98,7 +98,7 @@ st.title("Assistant Football avec Gemini")
 
 # Ajouter une image depuis GitHub
 image_url = "https://raw.githubusercontent.com/votre_utilisateur/votre_depot/branche/chemin/vers/image.jpg"  # Mettez ici l'URL de votre image
-st.image(image_url, caption="Bienvenue dans l'Assistant Football", use_column_width=True)
+st.image(image_url, caption="Bienvenue dans l'Assistant Football", use_container_width=True)
 
 st.markdown("Posez vos questions sur le football et obtenez des réponses intelligentes grâce à Gemini !")
 
