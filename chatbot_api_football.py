@@ -66,7 +66,7 @@ def get_player_stats(player_name, position_data):
     if position_data is attaquants:
         response = f"{player_name} a marqué {player_stats['Buts']} buts et réalisé {player_stats['Passes décisives']} passes décisives cette saison."
     elif position_data is milieux:
-        response = f"{player_name} a enregistré {player_stats['Passes décisives']} passes décisives et contribué à {player_stats['Buts + Passes décisives']} buts."
+        response = f"{player_name} a enregistré {player_stats['Passes décisives']} passes décisives et contribué à {player_stats['Buts']} buts."
     elif position_data is defenseurs:
         response = f"{player_name} a réalisé {player_stats['Tacles réussis']} tacles et {player_stats['Interceptions']} interceptions."
     
@@ -100,12 +100,12 @@ def compare_players(player_name1, player_name2, position_data):
     
     if position_data is attaquants:
         comparison += f" - Buts : {stats1['Buts']} vs {stats2['Buts']}\n"
-        comparison += f" - Passes décisives : {stats1['Passes décisives']} vs {stats2['Passes décisives']}\n"
+        comparison += f" - Passes décisives : {stats1['Passes decisives']} vs {stats2['Passes decisives']}\n"
     elif position_data is milieux:
-        comparison += f" - Passes décisives : {stats1['Passes décisives']} vs {stats2['Passes décisives']}\n"
-        comparison += f" - Contributions (Buts + Passes) : {stats1['Buts + Passes décisives']} vs {stats2['Buts + Passes décisives']}\n"
+        comparison += f" - Passes décisives : {stats1['Passes decisives']} vs {stats2['Passes decisives']}\n"
+        comparison += f" - Contributions (Buts + Passes) : {stats1['Buts + Passes decisives']} vs {stats2['Buts + Passes decisives']}\n"
     elif position_data is defenseurs:
-        comparison += f" - Tacles réalisés : {stats1['Tacles réussis']} vs {stats2['Tacles réussis']}\n"
+        comparison += f" - Tacles réalisés : {stats1['Tacles reussis']} vs {stats2['Tacles reussis']}\n"
         comparison += f" - Interceptions : {stats1['Interceptions']} vs {stats2['Interceptions']}\n"
     
     return comparison
