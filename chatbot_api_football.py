@@ -106,7 +106,7 @@ def compare_players(player_name1, player_name2, position_data):
         comparison += f" - Contributions (Buts + Passes) : {stats1['Buts + Passes décisives']} vs {stats2['Buts + Passes décisives']}\n"
     elif position_data is defenseurs:
         comparison += f" - Tacles réalisés : {stats1['Tacles reussis']} vs {stats2['Tacles reussis']}\n"
-        comparison += f" - Interceptions : {stats1['Interceptions']} vs {stats2['Interceptions']}\n"
+        comparison += f" - Interceptions : {stats1['Interceptions ']} vs {stats2['Interceptions ']}\n"
     
     return comparison
 
