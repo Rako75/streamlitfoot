@@ -111,7 +111,7 @@ def compare_players(player_name1, player_name2, position_data):
     return comparison
 
 # Interface Streamlit
-st.title("Bienvenue sur le chatbot de football dédié à la saison 2023-2024 des 5 plus grands championnats")
+st.title("Bienvenue sur le chatbot de football sur les statistiques des joueurs issus des 5 plus grands championnats de la saison 2023-2024")
 st.markdown("Posez vos questions sur le football !")
 
 # Choisir l'action souhaitée (statistiques, meilleurs buteurs, comparer)
