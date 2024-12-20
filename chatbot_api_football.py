@@ -2,10 +2,9 @@ import os
 import pandas as pd
 import google.generativeai as genai
 import streamlit as st
-import matplotlib.pyplot as plt
 
 # Définir la clé API Gemini
-os.environ["GEMINI_API_KEY"] = "votre_clé_API_GEMINI"  # Remplacez par votre clé API
+os.environ["GEMINI_API_KEY"] = "AIzaSyCqozHPzc1NRb-Xf4t6DEYTDIutFcOe_bU"  # Remplacez par votre clé API
 
 # Configurer l'API Gemini avec la clé API
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
@@ -54,26 +53,7 @@ def get_player_stats(player_name, position_data):
     elif position_data is defenseurs:
         response = f"{player_name} a réalisé {player_stats['Performance TklW']} tacles et {player_stats['Performance Blks']} blocs."
     
-    return response, player_stats
-
-# Fonction pour afficher un histogramme des statistiques d'un joueur
-def plot_player_stats(player_stats, player_name):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    
-    # Choisissez les statistiques à afficher
-    stats = ['Performance Gls', 'Performance Ast', 'Performance TklW', 'Performance Blks']
-    stats_values = [player_stats.get(stat, 0) for stat in stats]
-    
-    ax.bar(stats, stats_values, color='blue')
-    
-    # Personnaliser l'apparence de l'histogramme
-    ax.set_title(f"Statistiques de {player_name}", fontsize=16)
-    ax.set_xlabel("Statistiques", fontsize=12)
-    ax.set_ylabel("Valeur", fontsize=12)
-    ax.set_ylim(0, max(stats_values) + 5)  # Ajuster l'axe y pour mieux voir les barres
-    
-    # Afficher l'histogramme
-    st.pyplot(fig)
+    return response
 
 # Fonction pour obtenir les meilleurs buteurs d'une ligue
 def get_top_scorers(league_name, position_data):
@@ -115,11 +95,6 @@ def compare_players(player_name1, player_name2, position_data):
 
 # Interface Streamlit
 st.title("Assistant Football avec Gemini")
-
-# Ajouter une image depuis GitHub
-image_url = "https://raw.githubusercontent.com/username/repository/branch/assets/images/your_image.jpg"  # Mettez ici l'URL de votre image
-st.image(image_url, caption="Bienvenue dans l'Assistant Football", use_container_width=True)
-
 st.markdown("Posez vos questions sur le football et obtenez des réponses intelligentes grâce à Gemini !")
 
 # Choisir l'action souhaitée (statistiques, meilleurs buteurs, comparer)
@@ -138,11 +113,8 @@ if action == "Statistiques de joueur":
     
     if st.button("Obtenir les statistiques"):
         if player_name:
-            stats, player_stats = get_player_stats(player_name, data)
+            stats = get_player_stats(player_name, data)
             st.text_area("Statistiques du joueur", stats, height=200)
-            
-            # Afficher l'histogramme des statistiques
-            plot_player_stats(player_stats, player_name)
         else:
             st.error("Veuillez entrer le nom d'un joueur.")
 
@@ -185,6 +157,8 @@ elif action == "Comparer deux joueurs":
 
 # Question générale avec Gemini
 if action == "Question générale":
+    st.markdown("**Note**: Veuillez poser uniquement des questions liées au football.")
+    
     prompt = st.text_area(
         "Posez votre question :",
         placeholder="Exemple : Qui sont les nominés pour le Ballon d'Or 2023 ? Quelles sont les statistiques de Lionel Messi cette saison ?",
