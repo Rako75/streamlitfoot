@@ -60,21 +60,6 @@ def plot_histogram(data, column, title):
     plt.ylabel('Fréquence')
     st.pyplot(plt)
 
-# Fonction pour afficher un graphique en barres pour comparer deux joueurs
-def plot_comparison(player1, player2, stats1, stats2, metrics, position):
-    values1 = [stats1[metric] for metric in metrics]
-    values2 = [stats2[metric] for metric in metrics]
-
-    fig, ax = plt.subplots(figsize=(8, 5))
-    x = range(len(metrics))
-    ax.bar(x, values1, width=0.4, label=player1, align='center')
-    ax.bar([i + 0.4 for i in x], values2, width=0.4, label=player2, align='center')
-    ax.set_xticks([i + 0.2 for i in x])
-    ax.set_xticklabels(metrics)
-    ax.set_title(f"Comparaison des joueurs ({position})")
-    ax.legend()
-    st.pyplot(fig)
-
 # Fonction pour obtenir les statistiques d'un joueur
 def get_player_stats(player_name, position_data, position):
     player_data = position_data[position_data['Joueur'].str.contains(player_name, case=False)]
@@ -104,22 +89,6 @@ def get_top_scorers(league_name, position_data):
 
     return top_scorers
 
-# Fonction pour comparer deux joueurs
-def compare_players(player1, player2, position_data, position):
-    player_data1 = position_data[position_data['Joueur'].str.contains(player1, case=False)]
-    player_data2 = position_data[position_data['Joueur'].str.contains(player2, case=False)]
-    
-    if player_data1.empty or player_data2.empty:
-        return "Un ou les deux joueurs n'ont pas été trouvés."
-    
-    stats1 = player_data1.iloc[0]
-    stats2 = player_data2.iloc[0]
-    metrics = ['Buts', 'Passes decisives'] if position == "Attaquants" else \
-              ['Passes decisives', 'Buts'] if position == "Milieux" else \
-              ['Tacles reussis', 'Interceptions ']
-
-    plot_comparison(player1, player2, stats1, stats2, metrics, position)
-
 # Interface Streamlit
 st.title("Assistant Football avec Gemini")
 st.markdown("Posez vos questions sur le football et obtenez des réponses intelligentes grâce à Gemini !")
@@ -139,7 +108,10 @@ if action == "Statistiques de joueur":
 
             # Graphique de répartition
             st.markdown("### Graphique : Répartition des statistiques")
-            plot_histogram(data, 'Buts', f"Répartition des buts - {position}")
+            if position == "Milieux":
+                plot_histogram(data, 'Passes decisives', "Répartition des passes décisives - Milieux")
+            elif position == "Défenseurs":
+                plot_histogram(data, 'Interceptions ', "Répartition des interceptions - Défenseurs")
         else:
             st.error("Veuillez entrer le nom d'un joueur.")
 
@@ -162,7 +134,8 @@ elif action == "Comparer deux joueurs":
 
     if st.button("Comparer les joueurs"):
         if player1 and player2:
-            compare_players(player1, player2, data, position)
+            # Comparaison visuelle et textuelle non implémentée dans cette version
+            st.markdown("Comparaison à venir")
         else:
             st.error("Veuillez entrer les noms des deux joueurs.")
 
