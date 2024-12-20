@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Définir la clé API Gemini
-os.environ["GEMINI_API_KEY"] = "AIzaSyCqozHPzc1NRb-Xf4t6DEYTDIutFcOe_bU"  # Remplacez par votre clé API
+os.environ["GEMINI_API_KEY"] = "AIzaSyCqozHPzc1NRb-Xf4t6DEYTDIutFcOe_bU"
 
 # Configurer l'API Gemini avec la clé API
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
