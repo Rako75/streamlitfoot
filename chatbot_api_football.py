@@ -66,7 +66,7 @@ def get_player_stats(player_name, position_data, position):
     elif position == "Milieux":
         return f"{player_name} a enregistré {player_stats['Passes decisives']} passes décisives et contribué à {player_stats['Buts']} buts."
     elif position == "Défenseurs":
-        return f"{player_name} a réalisé {player_stats['Tacles reussis']} tacles et {player_stats['Interceptions']} interceptions."
+        return f"{player_name} a réalisé {player_stats['Tacles reussis']} tacles et {player_stats['Interceptions ']} interceptions."
 
 # Fonction pour créer un radar chart
 def create_radar_chart(player1_stats, player2_stats, stats_labels, title):
@@ -139,7 +139,7 @@ if action == "Comparer deux joueurs":
                 elif position == "Milieux":
                     stats_labels = ['Passes decisives', 'Buts + Passes décisives', 'Passes progressives', 'Courses progressives', 'Passes vers le dernier tiers']
                 elif position == "Défenseurs":
-                    stats_labels = ['Tacles reussis', 'Interceptions', 'Duels aeriens gagnes', 'Actions menant a un tir', 'Passes reussies totales']
+                    stats_labels = ['Tacles reussis', 'Interceptions ', 'Duels aeriens gagnes', 'Actions menant a un tir', 'Passes reussies totales']
                 
                 create_radar_chart(player1_stats, player2_stats, stats_labels, f"Comparaison entre {player1} et {player2}")
             else:
