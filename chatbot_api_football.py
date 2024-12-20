@@ -2,19 +2,34 @@ import os
 import pandas as pd
 import google.generativeai as genai
 import streamlit as st
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Définir la clé API Gemini
-os.environ["GEMINI_API_KEY"] = "AIzaSyCqozHPzc1NRb-Xf4t6DEYTDIutFcOe_bU"
+os.environ["GEMINI_API_KEY"] = "AIzaSyCqozHPzc1NRb-Xf4t6DEYTDIutFcOe_bU"  
 
 # Configurer l'API Gemini avec la clé API
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
+# Fonction pour charger un fichier CSV avec gestion des encodages
+def load_csv_with_encoding(file_path):
+    """
+    Charge un fichier CSV en essayant différents encodages pour éviter les erreurs UnicodeDecodeError.
+    """
+    encodings = ['utf-8', 'iso-8859-1', 'latin1']  # Liste des encodages courants
+    for encoding in encodings:
+        try:
+            return pd.read_csv(file_path, encoding=encoding)
+        except UnicodeDecodeError:
+            continue
+    raise ValueError(f"Impossible de lire le fichier {file_path} avec les encodages essayés.")
+
 # Charger les sous-datasets (sans gardiens)
-attaquants = pd.read_csv('Attaquants_Big5.csv')
-milieux = pd.read_csv('Milieux_Big5.csv')
-defenseurs = pd.read_csv('Defenseurs_Big5.csv')
+try:
+    attaquants = load_csv_with_encoding('Attaquants_Big5.csv')
+    milieux = load_csv_with_encoding('Milieux_Big5.csv')
+    defenseurs = load_csv_with_encoding('Defenseurs_Big5.csv')
+except ValueError as e:
+    st.error(f"Erreur lors du chargement des fichiers : {e}")
+    st.stop()
 
 # Configuration du modèle de génération de texte Gemini
 generation_config = {
@@ -37,15 +52,6 @@ def generate_response(prompt):
     response = chat_session.send_message(prompt)
     return response.text
 
-# Fonction pour afficher un histogramme des buts
-def plot_histogram(data, column, title, xlabel):
-    plt.figure(figsize=(10, 6))
-    sns.histplot(data[column], kde=True, color="blue", bins=15)
-    plt.title(title, fontsize=16)
-    plt.xlabel(xlabel, fontsize=12)
-    plt.ylabel("Fréquence", fontsize=12)
-    st.pyplot(plt)
-
 # Fonction pour obtenir les statistiques d'un joueur
 def get_player_stats(player_name, position_data):
     player_data = position_data[position_data['Joueur'].str.contains(player_name, case=False)]
@@ -53,48 +59,29 @@ def get_player_stats(player_name, position_data):
     if player_data.empty:
         return f"Aucun joueur trouvé avec le nom {player_name}."
     
+    # Extraire les statistiques pertinentes
     player_stats = player_data.iloc[0]
     
+    # Formuler la réponse naturellement
     if position_data is attaquants:
-        response = (
-            f"{player_name} :\n"
-            f"- Buts : {player_stats['Buts']}\n"
-            f"- Passes décisives : {player_stats['Passes décisives']}\n"
-            f"- Minutes jouées : {player_stats['Minutes jouées']}\n"
-        )
+        response = f"{player_name} a marqué {player_stats['Buts']} buts et réalisé {player_stats['Passes décisives']} passes décisives cette saison."
     elif position_data is milieux:
-        response = (
-            f"{player_name} :\n"
-            f"- Passes décisives : {player_stats['Passes décisives']}\n"
-            f"- Passes progressives : {player_stats['Passes progressives']}\n"
-            f"- Courses progressives : {player_stats['Courses progressives']}\n"
-        )
+        response = f"{player_name} a enregistré {player_stats['Passes décisives']} passes décisives et contribué à {player_stats['Buts + Passes décisives']} buts."
     elif position_data is defenseurs:
-        response = (
-            f"{player_name} :\n"
-            f"- Tacles réussis : {player_stats['Tacles réussis']}\n"
-            f"- Interceptions : {player_stats['Interceptions']}\n"
-            f"- Minutes jouées : {player_stats['Minutes jouées']}\n"
-        )
+        response = f"{player_name} a réalisé {player_stats['Tacles réussis']} tacles et {player_stats['Interceptions']} interceptions."
     
     return response
 
 # Fonction pour obtenir les meilleurs buteurs d'une ligue
 def get_top_scorers(league_name, position_data):
     league_data = position_data[position_data['Ligue'].str.contains(league_name, case=False)]
+    
+    # Trier les joueurs par nombre de buts marqués
     top_scorers = league_data[['Joueur', 'Buts']].sort_values(by='Buts', ascending=False).head(5)
     
-    response = f"Meilleurs buteurs de la {league_name} :\n"
+    response = f"Voici les meilleurs buteurs de la {league_name} :\n"
     for index, row in top_scorers.iterrows():
-        response += f"- {row['Joueur']} avec {row['Buts']} buts.\n"
-    
-    # Afficher un graphique des meilleurs buteurs
-    plt.figure(figsize=(8, 5))
-    sns.barplot(x='Buts', y='Joueur', data=top_scorers, palette='coolwarm')
-    plt.title(f"Top 5 buteurs de la {league_name}", fontsize=16)
-    plt.xlabel("Buts", fontsize=12)
-    plt.ylabel("Joueur", fontsize=12)
-    st.pyplot(plt)
+        response += f"{row['Joueur']} avec {row['Buts']} buts.\n"
     
     return response
 
@@ -112,36 +99,14 @@ def compare_players(player_name1, player_name2, position_data):
     comparison = f"Comparaison entre {stats1['Joueur']} et {stats2['Joueur']} :\n"
     
     if position_data is attaquants:
-        comparison += (
-            f" - Buts : {stats1['Buts']} vs {stats2['Buts']}\n"
-            f" - Passes décisives : {stats1['Passes décisives']} vs {stats2['Passes décisives']}\n"
-        )
+        comparison += f" - Buts : {stats1['Buts']} vs {stats2['Buts']}\n"
+        comparison += f" - Passes décisives : {stats1['Passes décisives']} vs {stats2['Passes décisives']}\n"
     elif position_data is milieux:
-        comparison += (
-            f" - Passes progressives : {stats1['Passes progressives']} vs {stats2['Passes progressives']}\n"
-            f" - Courses progressives : {stats1['Courses progressives']} vs {stats2['Courses progressives']}\n"
-        )
+        comparison += f" - Passes décisives : {stats1['Passes décisives']} vs {stats2['Passes décisives']}\n"
+        comparison += f" - Contributions (Buts + Passes) : {stats1['Buts + Passes décisives']} vs {stats2['Buts + Passes décisives']}\n"
     elif position_data is defenseurs:
-        comparison += (
-            f" - Tacles réussis : {stats1['Tacles réussis']} vs {stats2['Tacles réussis']}\n"
-            f" - Interceptions : {stats1['Interceptions']} vs {stats2['Interceptions']}\n"
-        )
-    
-    # Graphique de comparaison
-    metrics = ['Buts', 'Passes décisives'] if position_data is attaquants else (
-              ['Passes progressives', 'Courses progressives'] if position_data is milieux else
-              ['Tacles réussis', 'Interceptions'])
-    values1 = [stats1[metric] for metric in metrics]
-    values2 = [stats2[metric] for metric in metrics]
-    
-    plt.figure(figsize=(10, 5))
-    x = range(len(metrics))
-    plt.bar(x, values1, width=0.4, label=stats1['Joueur'], align='center')
-    plt.bar([p + 0.4 for p in x], values2, width=0.4, label=stats2['Joueur'], align='center')
-    plt.xticks([p + 0.2 for p in x], metrics)
-    plt.title("Comparaison des joueurs", fontsize=16)
-    plt.legend()
-    st.pyplot(plt)
+        comparison += f" - Tacles réalisés : {stats1['Tacles réussis']} vs {stats2['Tacles réussis']}\n"
+        comparison += f" - Interceptions : {stats1['Interceptions']} vs {stats2['Interceptions']}\n"
     
     return comparison
 
@@ -149,6 +114,7 @@ def compare_players(player_name1, player_name2, position_data):
 st.title("Assistant Football avec Gemini")
 st.markdown("Posez vos questions sur le football et obtenez des réponses intelligentes grâce à Gemini !")
 
+# Choisir l'action souhaitée (statistiques, meilleurs buteurs, comparer)
 action = st.radio("Que souhaitez-vous savoir ?", ("Statistiques de joueur", "Meilleurs buteurs", "Comparer deux joueurs", "Question générale"))
 
 if action == "Statistiques de joueur":
@@ -206,12 +172,19 @@ elif action == "Comparer deux joueurs":
         else:
             st.error("Veuillez entrer les noms des deux joueurs.")
 
+# Question générale avec Gemini
 if action == "Question générale":
-    st.markdown("Posez une question sur le football.")
-    prompt = st.text_area("Votre question :")
+    st.markdown("**Note**: Veuillez poser uniquement des questions liées au football.")
+    
+    prompt = st.text_area(
+        "Posez votre question :",
+        placeholder="Exemple : Qui sont les nominés pour le Ballon d'Or 2023 ? Quelles sont les statistiques de Lionel Messi cette saison ?",
+    )
+
     if st.button("Obtenir une réponse"):
         if prompt:
+            # Génération de réponse avec Gemini
             answer = generate_response(f"Répondre uniquement sur le football : {prompt}")
             st.markdown(f"**Réponse :** {answer}")
         else:
-            st.error("Veuillez entrer une question.")
+            st.error("Veuillez entrer une question avant de cliquer sur le bouton.")
