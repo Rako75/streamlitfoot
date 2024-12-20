@@ -178,7 +178,7 @@ if action == "Question générale":
     
     prompt = st.text_area(
         "Posez votre question :",
-        placeholder="Exemple : Qui sont les nominés pour le Ballon d'Or 2024 ? Quelles sont les statistiques de Lionel Messi cette saison ?",
+        placeholder="Exemple : Qui sont les nominés pour le Ballon d'Or 2024 ? Quelles sont les statistiques de Lionel Messi en 2023 ?",
     )
 
     if st.button("Obtenir une réponse"):
