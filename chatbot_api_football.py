@@ -108,7 +108,9 @@ if action == "Statistiques de joueur":
 
             # Graphique de répartition
             st.markdown("### Graphique : Répartition des statistiques")
-            if position == "Milieux":
+            if position == "Attaquants":
+                plot_histogram(data, 'Buts', "Répartition des buts - Attaquants")
+            elif position == "Milieux":
                 plot_histogram(data, 'Passes decisives', "Répartition des passes décisives - Milieux")
             elif position == "Défenseurs":
                 plot_histogram(data, 'Interceptions ', "Répartition des interceptions - Défenseurs")
