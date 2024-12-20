@@ -64,11 +64,11 @@ def get_player_stats(player_name, position_data):
     
     # Formuler la réponse naturellement
     if position_data is attaquants:
-        response = f"{player_name} a marqué {player_stats['Buts']} buts et réalisé {player_stats['Passes décisives']} passes décisives cette saison."
+        response = f"{player_name} a marqué {player_stats['Buts']} buts et réalisé {player_stats['Passes decisives']} passes décisives cette saison."
     elif position_data is milieux:
-        response = f"{player_name} a enregistré {player_stats['Passes décisives']} passes décisives et contribué à {player_stats['Buts']} buts."
+        response = f"{player_name} a enregistré {player_stats['Passes decisives']} passes décisives et contribué à {player_stats['Buts']} buts."
     elif position_data is defenseurs:
-        response = f"{player_name} a réalisé {player_stats['Tacles réussis']} tacles et {player_stats['Interceptions']} interceptions."
+        response = f"{player_name} a réalisé {player_stats['Tacles reussis']} tacles et {player_stats['Interceptions']} interceptions."
     
     return response
 
